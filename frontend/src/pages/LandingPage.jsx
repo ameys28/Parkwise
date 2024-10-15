@@ -1,10 +1,11 @@
+// src/pages/LandingPage.js
+
 import React, { useState } from 'react';
 import ResidentLogin from './ResidentLogin';
 import SecurityLogin from './SecurityLogin';
 import Header from '../components/Header';
 import HeroSection from '../components/HeroSection';
-import CardsSection from '../components/CardSection';
-
+import CardSection from '../components/CardSection';
 
 const LandingPage = () => {
   // State to manage both modals
@@ -24,8 +25,9 @@ const LandingPage = () => {
       <Header openResidentLogin={openResidentLogin} openSecurityLogin={openSecurityLogin} />
 
       {/* Content of the landing page */}
-      <HeroSection/>
-      <CardsSection/>
+      <HeroSection />
+      <CardSection />
+
       {/* Modals */}
       {/* Resident Login Modal */}
       <ResidentLogin isOpen={isResidentLoginOpen} onClose={closeResidentLogin} />

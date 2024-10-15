@@ -2,11 +2,14 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors'
+import bodyParser from 'body-parser';
+import routes from './src/routes/routes.js';
 
 dotenv.config({
   path: "./.env",
 });
 const app = express();
+
 
 app.use(
   cors({
@@ -14,7 +17,10 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+
+// Middleware
+app.use(bodyParser.json());
+app.use('/api', routes); // Prefix all routes with /api
 
 const connectDB = async () => {
   try {
