@@ -23,6 +23,7 @@ const SecurityDashboard = () => {
   // Function to add a new entry to the logs
   const addParkingLog = (numberPlate, isEntry) => {
     const logEntry = {
+      vehicleId: numberPlate,
       numberPlate,
       action: isEntry ? "Entry" : "Exit",
       timestamp: new Date().toLocaleString(),
@@ -32,12 +33,12 @@ const SecurityDashboard = () => {
 
   const handleManualOverride = () => {
     const vehicle = vehicles.find(
-      (v) => v.numberPlate.toLowerCase() === overrideId.toLowerCase()
+      (v) => v.numberPlate.toLowerCase() === vehicleId.toLowerCase()
     );
     if (vehicle) {
       toast.success(`Manual override successful for vehicle: ${vehicle.numberPlate}`);
-      addParkingLog(vehicle.numberPlate, true); // Log as entry for manual override
-      setOverrideId(""); // Clear the input after successful override
+      addParkingLog(vehicle.numberPlate, true);
+      setVehicleId("");
     } else {
       toast.error("Vehicle not found for override.");
     }
@@ -86,26 +87,35 @@ const SecurityDashboard = () => {
 
       {/* Vehicle Entry/Exit Query */}
       <section className="mb-10 px-8">
-        <h3 className="text-2xl font-semibold mb-4 text-[#799529] flex items-center">
-          <FaSearch className="mr-2" />
-          Vehicle Entry/Exit Query
-        </h3>
-        <input
-          type="text"
-          placeholder="Enter vehicle number"
-          value={vehicleId}
-          onChange={(e) => setVehicleId(e.target.value)}
-          className="p-3 border border-[#799529] rounded-lg w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-md"
-          style={{ color: "#000000" }}
-          aria-label="Vehicle Number"
-        />
-        <button
-          className="py-3 px-6 rounded-lg bg-[#799529] text-white hover:bg-green-700 transition duration-300 shadow-md"
-          onClick={handleSearchVehicle}
-        >
-          Search
-        </button>
-      </section>
+  <h3 className="text-2xl font-semibold mb-4 text-[#799529] flex items-center">
+    <FaPlusCircle className="mr-2" />
+    Vehicle Entry/Exit Query & Manual Override
+  </h3>
+  <input
+    type="text"
+    placeholder="Enter vehicle number"
+    value={vehicleId}
+    onChange={(e) => setVehicleId(e.target.value)}
+    className="p-3 border border-[#92AB42] rounded-lg w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-md"
+    style={{ color: "#000000" }}
+    aria-label="Vehicle Number"
+  />
+  <div className="space-x-4">
+    <button
+      className="py-3 px-6 rounded-lg bg-[#799529] text-white hover:bg-green-700 transition duration-300 shadow-md"
+      onClick={handleSearchVehicle}
+    >
+      Search
+    </button>
+    <button
+      className="py-3 px-6 rounded-lg bg-[#92AB42] text-white hover:bg-red-700 transition duration-300 shadow-md"
+      onClick={handleManualOverride}
+    >
+      Override
+    </button>
+  </div>
+</section>
+
 
       {/* Entry/Exit Logs */}
       <section className="mb-10 px-8">
@@ -146,7 +156,7 @@ const SecurityDashboard = () => {
       </section>
 */}
       {/* Manual Override */}
-      <section className="mb-10 px-8">
+      {/* <section className="mb-10 px-8">
         <h3 className="text-2xl font-semibold mb-4 text-[#799529] flex items-center">
           <FaPlusCircle className="mr-2" />
           Manual Override
@@ -166,7 +176,7 @@ const SecurityDashboard = () => {
         >
           Override
         </button>
-      </section>
+      </section> */}
 
       {/* Add New Resident */}
       <section className="mb-10 px-8">
