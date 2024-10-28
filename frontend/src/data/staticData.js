@@ -33,13 +33,7 @@ export const vehicles = [
 ];
 
 export const entryLogs = [
-  {
-    id: 1,
-    vehicleId: "PQR321",
-    numberPlate: "PQR321",
-    action: "Entry",
-    timestamp: "10/28/2024, 10:29:03 PM",
-  },
+  
   {
     id: 2,
     vehicleId: "XYZ789",
