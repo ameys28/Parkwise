@@ -128,7 +128,7 @@ const SecurityDashboard = () => {
         </ul>
       </section>
 
-      {/* Notifications */}
+      {/* Notifications 
       <section className="mb-10 px-8">
         <h3 className="text-2xl font-semibold mb-4 text-[#799529]">
           Notifications
@@ -144,7 +144,7 @@ const SecurityDashboard = () => {
           ))}
         </ul>
       </section>
-
+*/}
       {/* Manual Override */}
       <section className="mb-10 px-8">
         <h3 className="text-2xl font-semibold mb-4 text-[#799529] flex items-center">
