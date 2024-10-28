@@ -55,153 +55,161 @@ const ResidentDashboard = () => {
   };
 
   return (
-    <div
-      className="resident-dashboard min-h-screen"
-      style={{ backgroundColor: "#F5F9D0" }}
-    >
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-      />
-      <header className="flex justify-between items-center py-2 px-8 bg-[#ff9fa0] shadow-md mb-8">
-        <div className="logo flex items-center">
-          <img src={logo} alt="ParkWise Logo" className="h-20 w-30" />
-        </div>
-        <h2
-          className="text-4xl font-bold text-center"
-          style={{ color: "#4A6D0A" }}
-        >
-          Resident Dashboard
-        </h2>
-        <div className="space-x-4">
-          <button
-            className="bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition duration-300 shadow-md"
-            onClick={handleClick}
-          >
-            Logout
-          </button>
-        </div>
-      </header>
-      {/* Section: Registered Vehicles */}
-      <section className="mb-10 px-8">
-        <h3
-          className="text-2xl font-semibold mb-6"
-          style={{ color: "#4A6D0A" }}
-        >
-          Registered Vehicles
-        </h3>
-        <ul
-          className="p-6 rounded-lg shadow space-y-4"
-          style={{ backgroundColor: "#FFDFB0" }}
-        >
-          {vehiclesList.map((vehicle) => (
-            <li
-              key={vehicle.id}
-              className="py-3 px-4 rounded-lg border border-[#D16C6C] transition hover:bg-[#FF9FA0]"
-              style={{ color: "#4A6D0A" }}
-            >
-              {vehicle.numberPlate} {vehicle.guest ? "(Guest)" : ""}
-            </li>
-          ))}
-        </ul>
-      </section>
-      <section className="mb-10 px-8">
-        <h3
-          className="text-2xl font-semibold mb-6"
-          style={{ color: "#4A6D0A" }}
-        >
-          Parking Logs
-        </h3>
-        <ul
-          className="p-6 rounded-lg shadow space-y-4"
-          style={{ backgroundColor: "#FFDFB0" }}
-        >
-          {entryLogs.map((log) => {
-            // Using static data directly from entryLogs
-            const vehicleNumber = log.numberPlate || "Unknown"; // Assuming log has a vehicleNumber field
-            const entryTime = new Date(log.timestamp);
-            const formattedEntryTime =
-              entryTime.toString() !== "Invalid Date"
-                ? entryTime.toLocaleString()
-                : "Invalid Date";
+    <div className="resident-dashboard min-h-screen" style={{ backgroundColor: "#F5F9D0", fontFamily: "'Kalnia', sans-serif" }}>
+  <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
 
-            return (
-              <li
-                key={log.id}
-                className="py-3 px-4 rounded-lg border border-[#D16C6C] transition hover:bg-[#FF9FA0]"
-                style={{ color: "#4A6D0A" }}
-              >
-                Vehicle {vehicleNumber} - {log.exitTime ? "Exited" : "Entered"}{" "}
-                at {formattedEntryTime}
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-      <section className="mb-10 px-8">
-        <h3
-          className="text-2xl font-semibold mb-6"
-          style={{ color: "#4A6D0A" }}
-        >
-          Current Occupancy
-        </h3>
-        <div
-          className="p-6 rounded-lg shadow text-center"
-          style={{ backgroundColor: "#FFDFB0", color: "#4A6D0A" }}
-        >
-          <p className="text-xl">
-            Current Occupancy: {occupancy} spot(s) filled
-          </p>
-        </div>
-      </section>
-      {/* Section: Register New Vehicle */}
-      <section className="mb-10 px-8">
-        <h3
-          className="text-2xl font-semibold mb-6"
-          style={{ color: "#4A6D0A" }}
-        >
-          Register New Vehicle
-        </h3>
+  {/* Navbar */}
+  <header className="flex justify-between items-center py-3 px-8" style={{ backgroundColor: "#FF9FA0" }}>
+    <div className="logo flex items-center">
+      <img src={logo} alt="ParkWise Logo" className="h-16 w-auto" />
+    </div>
+    <h2 className="text-4xl font-bold" style={{ color: "#3B3B3B" }}>
+      Resident Dashboard
+    </h2>
+    <button
+      className="bg-[#E44A4A] text-white px-5 py-2 rounded-full shadow transition duration-300"
+      onClick={handleClick}
+      style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: "bold" }}
+    >
+      Logout
+    </button>
+  </header>
+
+  {/* Main Content */}
+  <div className="grid grid-cols-2 gap-8 px-8 mt-10">
+    {/* Resident Reservation Section */}
+    <section
+      className="p-8 rounded-lg shadow-md border border-black"
+      style={{ backgroundColor: "#F9DFD8", color: "#3B3B3B", fontFamily: "'Orbitron', sans-serif" }}
+    >
+      <h3 className="text-2xl font-bold mb-4 text-center">
+        Resident Reservation
+      </h3>
+      <div className="flex items-center justify-between">
         <input
           type="text"
-          placeholder="Enter vehicle number"
+          placeholder="Enter Vehicle Number"
           value={newVehicleNumber}
           onChange={(e) => setNewVehicleNumber(e.target.value)}
-          className="p-3 border rounded-lg w-full mb-4 focus:outline-none focus:ring-2 focus:ring-[#4A6D0A]"
-          style={{ borderColor: "#D16C6C", color: "#4A6D0A" }}
+          className="p-2 w-full rounded-l-full border border-black"
+          style={{ backgroundColor: "#ECECEC", color: "#3B3B3B" }}
         />
         <button
-          className="py-3 px-6 rounded-lg bg-[#4A6D0A] hover:text-lg transition text-white"
+          className="bg-[#E44A4A] text-white ml-6 px-4 py-1 rounded-r-full shadow transition text-sm font-semibold"
           onClick={handleRegisterVehicle}
+          style={{ fontFamily: "'Orbitron', sans-serif" }}
         >
-          Register Vehicle
+          SAVE
         </button>
-      </section>
-      {/* Section: Reserve Guest Parking */}
-      <section className="mb-10 px-8">
-        <h3
-          className="text-2xl font-semibold mb-6"
-          style={{ color: "#4A6D0A" }}
-        >
-          Reserve Guest Parking
-        </h3>
+      </div>
+    </section>
+
+    {/* Guest Reservation Section */}
+    <section
+      className="p-8 rounded-lg shadow-md border border-black"
+      style={{ backgroundColor: "#F9DFD8", color: "#3B3B3B", fontFamily: "'Orbitron', sans-serif" }}
+    >
+      <h3 className="text-2xl font-bold mb-4 text-center">
+        Guest Reservation
+      </h3>
+      <div className="flex items-center justify-between">
         <input
           type="text"
-          placeholder="Enter guest vehicle number"
+          placeholder="Enter Guest Vehicle Number"
           value={guestVehicleNumber}
           onChange={(e) => setGuestVehicleNumber(e.target.value)}
-          className="p-3 border rounded-lg w-full mb-4 focus:outline-none focus:ring-2 focus:ring-[#FF9FA0]"
-          style={{ borderColor: "#D16C6C", color: "#4A6D0A" }}
+          className="p-2 w-full rounded-l-full border border-black"
+          style={{ backgroundColor: "#ECECEC", color: "#3B3B3B" }}
         />
         <button
-          className="py-3 px-6 rounded-lg bg-[#FF9FA0] hover:bg-[#FFDFB0] transition text-white"
+          className="bg-[#E44A4A] text-white ml-6 px-4 py-1 rounded-r-full shadow transition text-sm font-semibold"
           onClick={handleReserveGuestParking}
+          style={{ fontFamily: "'Orbitron', sans-serif" }}
         >
-          Reserve Guest Parking
+          SAVE
         </button>
-      </section>
+      </div>
+    </section>
+  </div>
+
+  {/* Occupancy Section */}
+  <section className="px-8 mt-10">
+    <div
+      className="p-6 rounded-lg shadow-md text-center border border-black"
+      style={{ backgroundColor: "#F9DFD8", color: "#3B3B3B" }}
+    >
+      <h3 className="text-2xl font-semibold" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+        OCCUPANCY
+      </h3>
+      <p className="text-md font-semibold mt-2">
+        Total Spots = 20 <br />
+        Current Occupancy: {occupancy} spot(s) filled
+      </p>
     </div>
+  </section>
+
+  {/* Logs and Registered Vehicles */}
+  <div className="grid grid-cols-2 gap-8 px-8 mt-10">
+    {/* Parking Logs */}
+    <section
+      className="p-6 rounded-r-3xl shadow-lg border border-black max-h-fit"
+      style={{
+        backgroundColor: "#F9DFD8",
+        color: "#3B3B3B",
+        fontFamily: "'Orbitron', sans-serif",
+        boxShadow: "8px 8px 0px #D1A3A4",
+      }}
+    >
+      <h3 className="text-lg font-semibold mb-4 text-center">
+        Parking Logs
+      </h3>
+      <ul className="overflow-y-auto" style={{ maxHeight: "200px" }}>
+        {entryLogs.map((log) => {
+          const vehicleNumber = log.numberPlate || "Unknown";
+          const entryTime = new Date(log.timestamp);
+          const formattedEntryTime = entryTime.toString() !== "Invalid Date" ? entryTime.toLocaleString() : "Invalid Date";
+
+          return (
+            <li
+              key={log.id}
+              className="py-3 px-4 rounded-lg border border-[#FF9FA0] transition hover:bg-[#FFDADA] mb-2"
+              style={{ color: "#3B3B3B" }}
+            >
+              Vehicle {vehicleNumber} - {log.exitTime ? "Exited" : "Entered"} at {formattedEntryTime}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+
+    {/* Registered Vehicles */}
+    <section
+      className="p-6 rounded-l-3xl shadow-lg border border-black max-h-fit"
+      style={{
+        backgroundColor: "#F9DFD8",
+        color: "#3B3B3B",
+        fontFamily: "'Orbitron', sans-serif",
+        boxShadow: "8px 8px 0px #D1A3A4",
+      }}
+    >
+      <h3 className="text-lg font-semibold mb-4 text-center">
+        Registered Vehicles
+      </h3>
+      <ul className="overflow-y-auto" style={{ maxHeight: "200px" }}>
+        {vehiclesList.map((vehicle) => (
+          <li
+            key={vehicle.id}
+            className="py-3 px-4 rounded-lg border border-[#FF9FA0] transition hover:bg-[#FFDADA] mb-2"
+            style={{ color: "#3B3B3B" }}
+          >
+            {vehicle.numberPlate} {vehicle.guest ? "(Guest)" : ""}
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+</div>
+
   );
 };
 

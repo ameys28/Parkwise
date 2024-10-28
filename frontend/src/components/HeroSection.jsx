@@ -6,7 +6,7 @@ const HeroSection = () => {
   return (
     <section className=" bg-[#F5F9D0] flex flex-row items-center justify-center text-center">
       <div>
-      <h1 className="text-5xl font-bold text-green-700">THE Best Way to Park !!</h1>
+      <h1 className="text-5xl font-bold text-green-700">The Best Way to Park !!</h1>
       <p className="text-2xl font-semibold text-green-600 mt-4">
         ParkWise - Effortless Parking, Anytime, Anywhere
       </p>
