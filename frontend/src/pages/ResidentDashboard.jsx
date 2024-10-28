@@ -2,6 +2,10 @@
 
 import React, { useState } from 'react';
 import { vehicles, entryLogs } from '../data/staticData';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import logo from '../assets/logo1.png';
 
 const ResidentDashboard = () => {
   const [vehiclesList, setVehiclesList] = useState(vehicles);
@@ -11,11 +15,11 @@ const ResidentDashboard = () => {
   );
   const [newVehicleNumber, setNewVehicleNumber] = useState('');
   const [guestVehicleNumber, setGuestVehicleNumber] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleRegisterVehicle = () => {
     if (!newVehicleNumber) {
-      alert('Please enter a vehicle number.');
+      toast.error('Please enter a vehicle number.');
       return;
     }
     const newVehicle = {
@@ -26,12 +30,17 @@ const ResidentDashboard = () => {
     };
     setVehiclesList([...vehiclesList, newVehicle]);
     setNewVehicleNumber('');
-    setSuccessMessage('Vehicle registered successfully!');
+    toast.success('Vehicle registered successfully!');
+  };
+
+  const handleClick = () => {
+    navigate('/');
+    toast.info('Logged out successfully!');
   };
 
   const handleReserveGuestParking = () => {
     if (!guestVehicleNumber) {
-      alert('Please enter a guest vehicle number.');
+      toast.error('Please enter a guest vehicle number.');
       return;
     }
     const guestVehicle = {
@@ -42,24 +51,32 @@ const ResidentDashboard = () => {
     };
     setVehiclesList([...vehiclesList, guestVehicle]);
     setGuestVehicleNumber('');
-    setSuccessMessage('Guest parking reserved successfully!');
+    toast.success('Guest parking reserved successfully!');
   };
 
   return (
-    <div className="resident-dashboard min-h-screen p-8" style={{ backgroundColor: '#F5F9D0' }}>
-      <h2 className="text-4xl font-bold mb-10 text-center" style={{ color: '#4A6D0A' }}>
-        Resident Dashboard
-      </h2>
-
-      {/* Success Message */}
-      {successMessage && (
-        <div className="mb-6 p-4 text-center rounded-lg bg-[#FFDFB0] text-[#C03A3A]">
-          {successMessage}
+    <div className="resident-dashboard min-h-screen" style={{ backgroundColor: '#F5F9D0' }}>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+      <header className="flex justify-between items-center py-2 px-8 bg-[#ff9fa0] shadow-md mb-8">
+        <div className="logo flex items-center">
+          <img src={logo} alt="ParkWise Logo" className="h-20 w-30" />
         </div>
-      )}
+        <h2
+          className="text-4xl font-bold text-center"
+          style={{ color: "#4A6D0A" }}
+        >
+          Resident Dashboard
+        </h2>
+        <div className="space-x-4">
+          {/* Logout button */}
+          <button className="bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition duration-300 shadow-md" onClick={handleClick}>
+            Logout
+          </button>
+        </div>
+      </header>
 
       {/* Section: Registered Vehicles */}
-      <section className="mb-10">
+      <section className="mb-10 px-8">
         <h3 className="text-2xl font-semibold mb-6" style={{ color: '#4A6D0A' }}>
           Registered Vehicles
         </h3>
@@ -77,7 +94,7 @@ const ResidentDashboard = () => {
       </section>
 
       {/* Section: Parking Logs */}
-      <section className="mb-10">
+      <section className="mb-10 px-8">
         <h3 className="text-2xl font-semibold mb-6" style={{ color: '#4A6D0A' }}>
           Parking Logs
         </h3>
@@ -99,7 +116,7 @@ const ResidentDashboard = () => {
       </section>
 
       {/* Section: Current Occupancy */}
-      <section className="mb-10">
+      <section className="mb-10 px-8">
         <h3 className="text-2xl font-semibold mb-6" style={{ color: '#4A6D0A' }}>
           Current Occupancy
         </h3>
@@ -109,7 +126,7 @@ const ResidentDashboard = () => {
       </section>
 
       {/* Section: Register New Vehicle */}
-      <section className="mb-10">
+      <section className="mb-10 px-8">
         <h3 className="text-2xl font-semibold mb-6" style={{ color: '#4A6D0A' }}>
           Register New Vehicle
         </h3>
@@ -122,7 +139,7 @@ const ResidentDashboard = () => {
           style={{ borderColor: '#D16C6C', color: '#4A6D0A' }}
         />
         <button
-          className="py-3 px-6 rounded-lg bg-[#4A6D0A] hover:bg-[#F5F9D0] transition text-white"
+          className="py-3 px-6 rounded-lg bg-[#4A6D0A] hover:text-lg transition text-white"
           onClick={handleRegisterVehicle}
         >
           Register Vehicle
@@ -130,7 +147,7 @@ const ResidentDashboard = () => {
       </section>
 
       {/* Section: Reserve Guest Parking */}
-      <section className="mb-10">
+      <section className="mb-10 px-8">
         <h3 className="text-2xl font-semibold mb-6" style={{ color: '#4A6D0A' }}>
           Reserve Guest Parking
         </h3>
