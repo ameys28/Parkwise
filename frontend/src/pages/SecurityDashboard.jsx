@@ -201,6 +201,7 @@ const SecurityDashboard = () => {
 
 const AddResidentForm = () => {
   const [residentName, setResidentName] = useState("");
+  const [residentEmail, setResidentEmail] = useState("");
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -211,6 +212,7 @@ const AddResidentForm = () => {
     }
     toast.success(`Resident ${residentName} with vehicle ${vehicleNumber} added successfully.`);
     setResidentName("");
+    setResidentEmail("");
     setVehicleNumber("");
     setSuccessMessage("Resident added successfully!");
   };
@@ -226,6 +228,15 @@ const AddResidentForm = () => {
         className="p-3 border border-[#92AB42] rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-400 shadow-md"
         style={{ color: "#000000" }}
         aria-label="Resident Name"
+      />
+      <input
+        type="email"
+        placeholder="Resident Email"
+        value={residentEmail}
+        onChange={(e) => setResidentEmail(e.target.value)}
+        className="p-3 border border-[#92AB42] rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-400 shadow-md"
+        style={{ color: "#000000" }}
+        aria-label="Resident Email"
       />
       <input
         type="text"

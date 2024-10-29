@@ -10,9 +10,7 @@ import logo from "../assets/logo1.png";
 const ResidentDashboard = () => {
   const [vehiclesList, setVehiclesList] = useState(vehicles);
   const [parkingLogsList, setParkingLogsList] = useState(entryLogs);
-  const [occupancy, setOccupancy] = useState(
-    entryLogs.filter((log) => !log.exitTime).length
-  );
+  const [occupancy, setOccupancy] = useState(10);
   const [newVehicleNumber, setNewVehicleNumber] = useState("");
   const [guestVehicleNumber, setGuestVehicleNumber] = useState("");
   const navigate = useNavigate();
@@ -28,6 +26,7 @@ const ResidentDashboard = () => {
       numberPlate: newVehicleNumber,
       guest: false,
     };
+    setOccupancy(occupancy+1);
     setVehiclesList([...vehiclesList, newVehicle]);
     setNewVehicleNumber("");
     toast.success("Vehicle registered successfully!");
@@ -49,6 +48,7 @@ const ResidentDashboard = () => {
       numberPlate: guestVehicleNumber,
       guest: true,
     };
+    setOccupancy(occupancy+1);
     setVehiclesList([...vehiclesList, guestVehicle]);
     setGuestVehicleNumber("");
     toast.success("Guest parking reserved successfully!");
