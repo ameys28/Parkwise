@@ -19,7 +19,7 @@ export const users = [
 export const vehicles = [
   {
     id: 1,
-    ownerId: 1, // Reference to user ID
+    ownerId: 1, 
     numberPlate: "ABC123",
     guest: false,
   },
