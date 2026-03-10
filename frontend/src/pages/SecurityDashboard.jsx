@@ -1,38 +1,66 @@
 // src/pages/SecurityDashboard.js
 
-import React, { useState } from "react";
-import { entryLogs, notifications, vehicles } from "../data/staticData";
+import React, { useState, useEffect } from "react";
+import { notifications } from "../data/staticData";
 import { FaSearch, FaPlusCircle } from "react-icons/fa";
 import NumberPlateRecognition from "./NumberPlateRecognition";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo1.png";
 import { toast, ToastContainer } from "react-toastify"; // Import toast and ToastContainer
 import "react-toastify/dist/ReactToastify.css"; // Import CSS for toast notifications
+import { getLogs, getVehicles, addLog } from "../services/api";
 
 const SecurityDashboard = () => {
-  const [parkingLogs, setParkingLogs] = useState(entryLogs); // Initialize logs from static data
+  const [parkingLogs, setParkingLogs] = useState([]);
+  const [vehiclesList, setVehiclesList] = useState([]);
   const [vehicleId, setVehicleId] = useState("");
   const [overrideId, setOverrideId] = useState("");
-  const [currentNotifications, setCurrentNotifications] = useState(notifications);  
+  const [currentNotifications, setCurrentNotifications] = useState(notifications);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [logsData, vehiclesData] = await Promise.all([
+        getLogs(),
+        getVehicles(),
+      ]);
+      setParkingLogs(logsData);
+      setVehiclesList(vehiclesData);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleClick = () => {
     navigate("/");
   };
 
   // Function to add a new entry to the logs
-  const addParkingLog = (numberPlate, isEntry) => {
-    const logEntry = {
-      vehicleId: numberPlate,
-      numberPlate,
-      action: isEntry ? "Entry" : "Exit",
-      timestamp: new Date().toLocaleString(),
-    };
-    setParkingLogs((prevLogs) => [...prevLogs, logEntry]);
+  const addParkingLog = async (numberPlate, isEntry) => {
+    try {
+      await addLog({ numberPlate, action: isEntry ? "Entry" : "Exit" });
+      await fetchData();
+    } catch (err) {
+      // Optimistic local update if API fails
+      const logEntry = {
+        vehicleId: numberPlate,
+        numberPlate,
+        action: isEntry ? "Entry" : "Exit",
+        timestamp: new Date().toISOString(),
+      };
+      setParkingLogs((prevLogs) => [logEntry, ...prevLogs]);
+      console.warn("addLog API failed, updated locally:", err.message);
+    }
   };
 
   const handleManualOverride = () => {
-    const vehicle = vehicles.find(
+    const vehicle = vehiclesList.find(
       (v) => v.numberPlate.toLowerCase() === vehicleId.toLowerCase()
     );
     if (vehicle) {
@@ -45,7 +73,7 @@ const SecurityDashboard = () => {
   };
 
   const handleSearchVehicle = () => {
-    const vehicle = vehicles.find(
+    const vehicle = vehiclesList.find(
       (v) => v.numberPlate.toLowerCase() === vehicleId.toLowerCase()
     );
     if (vehicle) {
@@ -54,7 +82,7 @@ const SecurityDashboard = () => {
       );
       const message = `Vehicle ${vehicle.numberPlate} has ${
         logs.length > 0
-          ? logs[logs.length - 1].action === "Entry"
+          ? logs[0].action === "Entry"
             ? "entered"
             : "exited"
           : "no records"
@@ -85,6 +113,12 @@ const SecurityDashboard = () => {
         </div>
       </header>
 
+      {loading ? (
+        <div className="flex justify-center items-center mt-20">
+          <p className="text-xl font-semibold text-[#799529]">Loading...</p>
+        </div>
+      ) : (
+        <>
       {/* Vehicle Entry/Exit Query */}
       <section className="mb-10 px-8">
   <h3 className="text-2xl font-semibold mb-4 text-[#799529] flex items-center">
@@ -193,6 +227,8 @@ const SecurityDashboard = () => {
         </h3>
         <NumberPlateRecognition addParkingLog={addParkingLog} />
       </section>
+        </>
+      )}
       
       <ToastContainer /> {/* Add ToastContainer for notifications */}
     </div>

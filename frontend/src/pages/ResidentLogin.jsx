@@ -11,14 +11,23 @@ const ResidentLogin = ({ isOpen, onClose }) => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    const result = login(username, password);
-    if (result.success && result.role === 'resident') {
-      navigate('/resident-dashboard');
-      onClose();
-    } else {
-      setError('Invalid credentials for Resident.');
+  const handleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const result = await login(username, password);
+      if (result.success && result.role === 'residents') {
+        navigate('/resident-dashboard');
+        onClose();
+      } else if (result.success) {
+        setError('Access denied. This login is for residents only.');
+      } else {
+        setError(result.error || 'Invalid credentials for Resident.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,10 +52,11 @@ const ResidentLogin = ({ isOpen, onClose }) => {
         aria-label="Password"
       />
       <button
-        className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition"
+        className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition disabled:opacity-50"
         onClick={handleLogin}
+        disabled={loading}
       >
-        Login
+        {loading ? 'Logging in...' : 'Login'}
       </button>
     </Modal>
   );

@@ -11,14 +11,23 @@ const SecurityLogin = ({ isOpen, onClose }) => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    const result = login(username, password);
-    if (result.success && result.role === 'security') {
-      navigate('/security-dashboard');
-      onClose();
-    } else {
-      setError('Invalid credentials for Security.');
+  const handleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const result = await login(username, password);
+      if (result.success && result.role === 'security') {
+        navigate('/security-dashboard');
+        onClose();
+      } else if (result.success) {
+        setError('Access denied. This login is for security personnel only.');
+      } else {
+        setError(result.error || 'Invalid credentials for Security.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,10 +52,11 @@ const SecurityLogin = ({ isOpen, onClose }) => {
         aria-label="Password"
       />
       <button
-        className="w-full bg-green-500 text-white py-3 rounded hover:bg-green-600 transition"
+        className="w-full bg-green-500 text-white py-3 rounded hover:bg-green-600 transition disabled:opacity-50"
         onClick={handleLogin}
+        disabled={loading}
       >
-        Login
+        {loading ? 'Logging in...' : 'Login'}
       </button>
     </Modal>
   );

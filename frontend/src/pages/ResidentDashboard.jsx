@@ -1,57 +1,88 @@
 // src/pages/ResidentDashboard.js
 
-import React, { useState } from "react";
-import { vehicles, entryLogs } from "../data/staticData";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../assets/logo1.png";
+import { AuthContext } from "../context/AuthContext.jsx";
+import { getVehicles, addVehicle, getLogs, getOccupancy } from "../services/api";
 
 const ResidentDashboard = () => {
-  const [vehiclesList, setVehiclesList] = useState(vehicles);
-  const [parkingLogsList, setParkingLogsList] = useState(entryLogs);
-  const [occupancy, setOccupancy] = useState(10);
+  const [vehiclesList, setVehiclesList] = useState([]);
+  const [parkingLogsList, setParkingLogsList] = useState([]);
+  const [occupancy, setOccupancy] = useState(0);
+  const [totalSpots, setTotalSpots] = useState(20);
   const [newVehicleNumber, setNewVehicleNumber] = useState("");
   const [guestVehicleNumber, setGuestVehicleNumber] = useState("");
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { auth, logout } = useContext(AuthContext);
 
-  const handleRegisterVehicle = () => {
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const ownerId = auth?.user?.username;
+      const [vehiclesData, logsData, occupancyData] = await Promise.all([
+        getVehicles(ownerId),
+        getLogs(),
+        getOccupancy(),
+      ]);
+      setVehiclesList(vehiclesData);
+      setParkingLogsList(logsData);
+      setOccupancy(occupancyData.occupancy ?? 0);
+      setTotalSpots(occupancyData.totalSpots ?? 20);
+    } finally {
+      setLoading(false);
+    }
+  }, [auth?.user?.username]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleRegisterVehicle = async () => {
     if (!newVehicleNumber) {
       toast.error("Please enter a vehicle number.");
       return;
     }
-    const newVehicle = {
-      id: vehiclesList.length + 1,
-      ownerId: 1,
-      numberPlate: newVehicleNumber,
-      guest: false,
-    };
-    setOccupancy(occupancy+1);
-    setVehiclesList([...vehiclesList, newVehicle]);
-    setNewVehicleNumber("");
-    toast.success("Vehicle registered successfully!");
+    try {
+      await addVehicle({
+        numberPlate: newVehicleNumber,
+        ownerId: auth?.user?.username || null,
+        guest: false,
+      });
+      setNewVehicleNumber("");
+      toast.success("Vehicle registered successfully!");
+      await fetchData();
+    } catch (err) {
+      toast.error("Failed to register vehicle: " + err.message);
+    }
   };
 
-  const handleClick = () => {
+  const handleClick = async () => {
+    await logout();
     navigate("/");
     toast.info("Logged out successfully!");
   };
 
-  const handleReserveGuestParking = () => {
+  const handleReserveGuestParking = async () => {
     if (!guestVehicleNumber) {
       toast.error("Please enter a guest vehicle number.");
       return;
     }
-    const guestVehicle = {
-      id: vehiclesList.length + 1,
-      ownerId: null,
-      numberPlate: guestVehicleNumber,
-      guest: true,
-    };
-    setOccupancy(occupancy+1);
-    setVehiclesList([...vehiclesList, guestVehicle]);
-    setGuestVehicleNumber("");
-    toast.success("Guest parking reserved successfully!");
+    try {
+      await addVehicle({
+        numberPlate: guestVehicleNumber,
+        ownerId: auth?.user?.username || null,
+        guest: true,
+      });
+      setGuestVehicleNumber("");
+      toast.success("Guest parking reserved successfully!");
+      await fetchData();
+    } catch (err) {
+      toast.error("Failed to reserve guest parking: " + err.message);
+    }
   };
 
   return (
@@ -75,6 +106,12 @@ const ResidentDashboard = () => {
     </button>
   </header>
 
+  {loading ? (
+    <div className="flex justify-center items-center mt-20">
+      <p className="text-xl font-semibold" style={{ color: "#3B3B3B" }}>Loading...</p>
+    </div>
+  ) : (
+    <>
   {/* Main Content */}
   <div className="grid grid-cols-2 gap-8 px-8 mt-10">
     {/* Resident Reservation Section */}
@@ -142,7 +179,7 @@ const ResidentDashboard = () => {
         OCCUPANCY
       </h3>
       <p className="text-md font-semibold mt-2">
-        Total Spots = 20 <br />
+        Total Spots = {totalSpots} <br />
         Current Occupancy: {occupancy} spot(s) filled
       </p>
     </div>
@@ -164,18 +201,18 @@ const ResidentDashboard = () => {
         Parking Logs
       </h3>
       <ul className="overflow-y-auto" style={{ maxHeight: "200px" }}>
-        {entryLogs.map((log) => {
+        {parkingLogsList.map((log, index) => {
           const vehicleNumber = log.numberPlate || "Unknown";
           const entryTime = new Date(log.timestamp);
-          const formattedEntryTime = entryTime.toString() !== "Invalid Date" ? entryTime.toLocaleString() : "Invalid Date";
+          const formattedEntryTime = entryTime.toString() !== "Invalid Date" ? entryTime.toLocaleString() : log.timestamp;
 
           return (
             <li
-              key={log.id}
+              key={log.logId || log.id || index}
               className="py-3 px-4 rounded-lg border border-[#FF9FA0] transition hover:bg-[#FFDADA] mb-2"
               style={{ color: "#3B3B3B" }}
             >
-              Vehicle {vehicleNumber} - {log.exitTime ? "Exited" : "Entered"} at {formattedEntryTime}
+              Vehicle {vehicleNumber} - {log.action === "Exit" ? "Exited" : "Entered"} at {formattedEntryTime}
             </li>
           );
         })}
@@ -196,9 +233,9 @@ const ResidentDashboard = () => {
         Registered Vehicles
       </h3>
       <ul className="overflow-y-auto" style={{ maxHeight: "200px" }}>
-        {vehiclesList.map((vehicle) => (
+        {vehiclesList.map((vehicle, index) => (
           <li
-            key={vehicle.id}
+            key={vehicle.vehicleId || vehicle.id || index}
             className="py-3 px-4 rounded-lg border border-[#FF9FA0] transition hover:bg-[#FFDADA] mb-2"
             style={{ color: "#3B3B3B" }}
           >
@@ -208,9 +245,12 @@ const ResidentDashboard = () => {
       </ul>
     </section>
   </div>
+    </>
+  )}
 </div>
 
   );
 };
 
 export default ResidentDashboard;
+
