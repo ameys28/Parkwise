@@ -26,8 +26,13 @@ const SecurityDashboard = () => {
         getLogs(),
         getVehicles(),
       ]);
-      setParkingLogs(logsData);
-      setVehiclesList(vehiclesData);
+      // Ensure data is always in expected format
+      setParkingLogs(Array.isArray(logsData) ? logsData : logsData?.Items || []);
+      setVehiclesList(Array.isArray(vehiclesData) ? vehiclesData : vehiclesData?.Items || []);
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+      setParkingLogs([]);
+      setVehiclesList([]);
     } finally {
       setLoading(false);
     }

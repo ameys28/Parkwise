@@ -18,6 +18,7 @@ const ResidentLogin = ({ isOpen, onClose }) => {
     setLoading(true);
     try {
       const result = await login(username, password);
+      console.log("LOGIN RESULT:", result);
       if (result.success && result.role === 'residents') {
         navigate('/resident-dashboard');
         onClose();

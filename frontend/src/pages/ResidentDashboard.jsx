@@ -28,10 +28,15 @@ const ResidentDashboard = () => {
         getLogs(),
         getOccupancy(),
       ]);
-      setVehiclesList(vehiclesData);
-      setParkingLogsList(logsData);
-      setOccupancy(occupancyData.occupancy ?? 0);
-      setTotalSpots(occupancyData.totalSpots ?? 20);
+      // Ensure data is always in expected format
+      setVehiclesList(Array.isArray(vehiclesData) ? vehiclesData : vehiclesData?.Items || []);
+      setParkingLogsList(Array.isArray(logsData) ? logsData : logsData?.Items || []);
+      setOccupancy(occupancyData?.occupancy ?? 0);
+      setTotalSpots(occupancyData?.totalSpots ?? 20);
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+      setVehiclesList([]);
+      setParkingLogsList([]);
     } finally {
       setLoading(false);
     }

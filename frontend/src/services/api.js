@@ -19,15 +19,27 @@ async function apiFetch(path, options = {}) {
     throw new Error('VITE_API_BASE_URL is not configured. See frontend/.env.example.');
   }
   const url = `${API_BASE_URL}${path}`;
+  console.log(`[API] ${options.method || 'GET'} ${url}`, options.body || '');
   const response = await fetch(url, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   });
+  const text = await response.text();
+  console.log(`[API] Response ${response.status}:`, text);
   if (!response.ok) {
-    const text = await response.text();
     throw new Error(`API error ${response.status}: ${text}`);
   }
-  return response.json();
+  let parsed = JSON.parse(text);
+  // API Gateway without Lambda Proxy integration wraps the full Lambda response —
+  // detect and unwrap it so the frontend gets the actual data.
+  if (parsed !== null && typeof parsed === 'object' && typeof parsed.statusCode === 'number' && 'body' in parsed) {
+    const innerBody = typeof parsed.body === 'string' ? JSON.parse(parsed.body) : parsed.body;
+    if (parsed.statusCode < 200 || parsed.statusCode >= 300) {
+      throw new Error(`API error ${parsed.statusCode}: ${JSON.stringify(innerBody)}`);
+    }
+    return innerBody;
+  }
+  return parsed;
 }
 
 /**

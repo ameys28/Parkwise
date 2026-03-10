@@ -12,7 +12,9 @@ export const AuthContext = createContext();
  */
 async function getUserRole() {
   try {
-    const session = await fetchAuthSession();
+    
+const session = await fetchAuthSession();
+console.log("FULL SESSION:", session);
     const groups = session.tokens?.idToken?.payload?.['cognito:groups'];
     if (Array.isArray(groups) && groups.length > 0) {
       return groups[0]; // e.g. "residents" or "security"
@@ -48,12 +50,28 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      await signIn({ username, password });
-      const role = await getUserRole();
-      setAuth({
-        isAuthenticated: true,
-        user: { username, role },
-      });
+      const { isSignedIn, nextStep } = await signIn({ username, password });
+
+      if (!isSignedIn) {
+        if (nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+          return {
+            success: false,
+            error: 'Your account requires a password reset. Go to AWS Cognito Console → Users → select your user → Actions → Reset password, then try again.',
+          };
+        }
+        return { success: false, error: `Sign-in incomplete: ${nextStep?.signInStep}` };
+      }
+
+      const session = await fetchAuthSession({ forceRefresh: true });
+      const groups = session.tokens?.idToken?.payload?.['cognito:groups'];
+
+      let role = null;
+      if (Array.isArray(groups)) {
+        if (groups.includes('residents')) role = 'residents';
+        if (groups.includes('security')) role = 'security';
+      }
+
+      setAuth({ isAuthenticated: true, user: { username, role } });
       return { success: true, role };
     } catch (err) {
       return { success: false, error: err.message };

@@ -4,7 +4,7 @@
 // Optionally filters by ownerId query parameter.
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, ScanCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -23,12 +23,10 @@ export const handler = async (event) => {
     let result;
 
     if (ownerId) {
-      // Query by ownerId using a GSI (Global Secondary Index) on ownerId
-      // TODO: Create a GSI named "ownerId-index" on the parkwise-vehicles table with ownerId as the partition key
-      result = await docClient.send(new QueryCommand({
+      // Filter by ownerId using Scan + FilterExpression (no GSI required)
+      result = await docClient.send(new ScanCommand({
         TableName: 'parkwise-vehicles',
-        IndexName: 'ownerId-index',
-        KeyConditionExpression: 'ownerId = :ownerId',
+        FilterExpression: 'ownerId = :ownerId',
         ExpressionAttributeValues: { ':ownerId': ownerId },
       }));
     } else {
