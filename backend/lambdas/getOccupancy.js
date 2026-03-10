@@ -9,7 +9,7 @@ import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
-const TOTAL_SPOTS = 20;
+const TOTAL_SPOTS = parseInt(process.env.TOTAL_SPOTS || '20', 10);
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

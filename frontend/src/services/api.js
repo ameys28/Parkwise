@@ -2,12 +2,22 @@
 // Centralized API service for ParkWise backend (AWS API Gateway + Lambda + DynamoDB)
 
 // TODO: Set VITE_API_BASE_URL in your .env file (see .env.example)
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://YOUR_API_GATEWAY_URL/prod';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+if (!API_BASE_URL) {
+  console.warn(
+    '[ParkWise] VITE_API_BASE_URL is not set. ' +
+    'API calls will fail. Copy frontend/.env.example to frontend/.env and fill in your API Gateway URL.'
+  );
+}
 
 /**
  * Helper that performs a fetch and throws on non-2xx responses.
  */
 async function apiFetch(path, options = {}) {
+  if (!API_BASE_URL) {
+    throw new Error('VITE_API_BASE_URL is not configured. See frontend/.env.example.');
+  }
   const url = `${API_BASE_URL}${path}`;
   const response = await fetch(url, {
     headers: { 'Content-Type': 'application/json' },
