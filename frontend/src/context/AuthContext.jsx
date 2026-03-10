@@ -1,9 +1,27 @@
-// src/context/AuthContext.js
+// src/context/AuthContext.jsx
 
-import React, { createContext, useState } from 'react';
-import { users } from '../data/staticData';
+import React, { createContext, useState, useEffect } from 'react';
+import { signIn, signOut, getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 
 export const AuthContext = createContext();
+
+/**
+ * Extracts the user's role from the Cognito ID token.
+ * The role is derived from the first entry of the `cognito:groups` claim.
+ * Returns "resident" or "security" (or null if no group is found).
+ */
+async function getUserRole() {
+  try {
+    const session = await fetchAuthSession();
+    const groups = session.tokens?.idToken?.payload?.['cognito:groups'];
+    if (Array.isArray(groups) && groups.length > 0) {
+      return groups[0]; // e.g. "residents" or "security"
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
@@ -11,25 +29,44 @@ export const AuthProvider = ({ children }) => {
     user: null,
   });
 
-  const login = (username, password) => {
-    const user = users.find(
-      (u) => u.username === username && u.password === password
-    );
-    if (user) {
+  // Restore session on page reload
+  useEffect(() => {
+    (async () => {
+      try {
+        const cognitoUser = await getCurrentUser();
+        const role = await getUserRole();
+        setAuth({
+          isAuthenticated: true,
+          user: { username: cognitoUser.username, role },
+        });
+      } catch {
+        // No active session — user is not logged in
+        setAuth({ isAuthenticated: false, user: null });
+      }
+    })();
+  }, []);
+
+  const login = async (username, password) => {
+    try {
+      await signIn({ username, password });
+      const role = await getUserRole();
       setAuth({
         isAuthenticated: true,
-        user: { id: user.id, username: user.username, role: user.role },
+        user: { username, role },
       });
-      return { success: true, role: user.role };
+      return { success: true, role };
+    } catch (err) {
+      return { success: false, error: err.message };
     }
-    return { success: false };
   };
 
-  const logout = () => {
-    setAuth({
-      isAuthenticated: false,
-      user: null,
-    });
+  const logout = async () => {
+    try {
+      await signOut();
+    } catch {
+      // Ignore sign-out errors
+    }
+    setAuth({ isAuthenticated: false, user: null });
   };
 
   return (

@@ -1,54 +1,13 @@
 // src/data/staticData.js
 
-export const users = [
-  {
-    id: 1,
-    username: "amey",
-    password: "1234",
-    role: "resident",
-  },
-  {
-    id: 2,
-    username: "dishan",
-    password: "1234",
-    role: "security",
-  },
-  // Add more users as needed
-];
+// NOTE: The `users` array has been removed.
+// Authentication is now handled by AWS Cognito via aws-amplify.
 
-export const vehicles = [
-  {
-    id: 1,
-    ownerId: 1, 
-    numberPlate: "ABC123",
-    guest: false,
-  },
-  {
-    id: 2,
-    ownerId: 1,
-    numberPlate: "XYZ789",
-    guest: true,
-  },
-  // Add more vehicles as needed
-];
+// NOTE: vehicles and entryLogs are now fetched from DynamoDB via AWS API Gateway.
+// These empty arrays serve as the initial state before data is loaded from the backend.
+export const vehicles = [];
 
-export const entryLogs = [
-  
-  {
-    id: 2,
-    vehicleId: "XYZ789",
-    numberPlate: "XYZ789",
-    action: "Entry",
-    timestamp: "10/28/2024, 07:48:40 PM",
-  },
-  {
-    id: 3,
-    vehicleId: "ABC123",
-    numberPlate: "ABC123",
-    action: "Entry",
-    timestamp: "10/28/2024, 02:20:40 PM",
-  },
-];
+export const entryLogs = [];
 
 export const notifications = [
   {
