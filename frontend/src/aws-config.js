@@ -6,13 +6,13 @@ const awsConfig = {
   Auth: {
     Cognito: {
       // TODO: Replace with your Cognito User Pool ID (e.g., "us-east-1_AbCdEfGhI")
-      userPoolId: 'YOUR_USER_POOL_ID',
+      userPoolId: 'ap-south-1_8s6ArwUTs',
 
       // TODO: Replace with your Cognito App Client ID
-      userPoolClientId: 'YOUR_APP_CLIENT_ID',
+      userPoolClientId: '2asp6p8qg05fmcqrk0rsnunskb',
 
       // TODO: Replace with your AWS region (e.g., "us-east-1")
-      region: 'YOUR_AWS_REGION',
+      region: 'ap-south-1',
     },
   },
 };
